@@ -97,9 +97,9 @@ print('\n{:*^50}\n'.format("Generado grafico..."))
 
 # Inicializacion de variables
 acciones = []
-dateInicioSeptiembre = np.datetime64('2020-09-01')
-dateInicioOctubre = np.datetime64('2020-10-01')
-dateInicioNombiembre = np.datetime64('2020-11-01')
+dateInicioSeptiembre = np.datetime64('2005-09-01')
+dateInicioOctubre = np.datetime64('2005-10-01')
+dateInicioNombiembre = np.datetime64('2005-11-01')
 primerDiaSeptiembre = True
 primerDiaOctubre = True
 primerDiaNoviembre = True
@@ -125,16 +125,16 @@ for i in range(cant1):
     if i > 0:
         date=np.datetime64(data1["date"][i])
 
-        if dateInicioSeptiembre >= date and primerDiaSeptiembre:
+        if date >= dateInicioSeptiembre and primerDiaSeptiembre:
             valoresInicioCierreMeses1.append(data1["open"][i])
             primerDiaSeptiembre = False
 
-        if dateInicioOctubre >= date and primerDiaOctubre:
+        if date >= dateInicioOctubre and primerDiaOctubre:
             valoresInicioCierreMeses1.append(data1["open"][i-1])
             valoresInicioCierreMeses1.append(data1["open"][i])
             primerDiaOctubre = False
 
-        if dateInicioNombiembre >= date and primerDiaNoviembre:
+        if date >= dateInicioNombiembre and primerDiaNoviembre:
             valoresInicioCierreMeses1.append(data1["open"][i-1])
             primerDiaNoviembre = False
 
@@ -166,16 +166,16 @@ for i in range(cant2):
     if i > 0:
         date=np.datetime64(data2["date"][i])
 
-        if dateInicioSeptiembre >= date and primerDiaSeptiembre:
+        if date >= dateInicioSeptiembre and primerDiaSeptiembre:
             valoresInicioCierreMeses2.append(data2["open"][i])
             primerDiaSeptiembre = False
 
-        if dateInicioOctubre >= date and primerDiaOctubre:
+        if date >= dateInicioOctubre and primerDiaOctubre:
             valoresInicioCierreMeses2.append(data2["open"][i-1])
             valoresInicioCierreMeses2.append(data2["open"][i])
             primerDiaOctubre = False
 
-        if dateInicioNombiembre >= date and primerDiaNoviembre:
+        if date >= dateInicioNombiembre and primerDiaNoviembre:
             valoresInicioCierreMeses2.append(data2["open"][i-1])
             primerDiaNoviembre = False
 
@@ -214,5 +214,63 @@ plt.plot(xDer2, yDer2, 'r--', label = 'Derivadas ' + acciones[1])
 plt.xticks(xAcc1[ : :200]) # Mostrar una de cada 200 fechas
 plt.legend()
 plt.show()
+
+# Calculo de que accion creo mas en diferentes periodos
+difAcc1Sep = valoresInicioCierreMeses1[1] - valoresInicioCierreMeses1[0]
+difAcc1Oct = valoresInicioCierreMeses1[3] - valoresInicioCierreMeses1[2]
+
+difAcc2Sep = valoresInicioCierreMeses2[1] - valoresInicioCierreMeses2[0]
+difAcc2Oct = valoresInicioCierreMeses2[3] - valoresInicioCierreMeses2[2]
+
+textoCrecimientoSep = ''
+if difAcc1Sep > difAcc2Sep:
+    tendencia = 'crecio'
+    indice = 0
+    if difAcc1Sep < 0:
+        tendencia = 'bajo'
+        indice = 1
+    textoCrecimientoSep = 'En Septiembre ' + tendencia + ' mas la accion: ' + acciones[indice]
+elif difAcc1Sep < difAcc2Sep:
+    tendencia = 'crecio'
+    indice = 1
+    if difAcc2Sep < 0:
+        tendencia = 'bajo'
+        indice = 0
+    textoCrecimientoSep = 'En Septiembre ' + tendencia + ' mas la accion: ' + acciones[indice]
+else:
+    textoCrecimientoSep = 'Ambas acciones variaron lo mismo en Septiembre.'
+
+textoCrecimientoOct = ''
+if difAcc1Oct > difAcc2Oct:
+    tendencia = 'crecio'
+    indice = 0
+    if difAcc1Oct < 0:
+        tendencia = 'bajo'
+        indice = 1
+    textoCrecimientoOct = 'En Octubre ' + tendencia + ' mas la accion: ' + acciones[indice]
+elif difAcc1Oct < difAcc2Oct:
+    tendencia = 'crecio'
+    indice = 1
+    if difAcc2Oct < 0:
+        tendencia = 'bajo'
+        indice = 0
+    textoCrecimientoOct = 'En Octubre ' + tendencia + ' mas la accion: ' + acciones[indice]
+else:
+    textoCrecimientoOct = 'Ambas acciones variaron lo mismo en Octubre.'
+
+infoVariaciones = {
+    'Precio inicio Septiembre de ' + acciones[0]: valoresInicioCierreMeses1[0],
+    'Precio fin Septiembre de ' + acciones[0]: valoresInicioCierreMeses1[1],
+    'Precio inicio Octubre de ' + acciones[0]: valoresInicioCierreMeses1[2],
+    'Precio fin Octubre de ' + acciones[0]: valoresInicioCierreMeses1[3],
+    'Precio inicio Septiembre de ' + acciones[1]: valoresInicioCierreMeses2[0],
+    'Precio fin Septiembre de ' + acciones[1]: valoresInicioCierreMeses2[1],
+    'Precio inicio Octubre de ' + acciones[1]: valoresInicioCierreMeses2[2],
+    'Precio fin Octubre de ' + acciones[1]: valoresInicioCierreMeses2[3],
+    'Variacion Septiembre': textoCrecimientoSep,
+    'Variacion Octubre': textoCrecimientoOct
+}
+df = pd.DataFrame.from_dict(infoVariaciones, orient='index')
+df.to_excel("variaciones.xlsx")
 
 print('\n{:*^50}\n'.format("Fin de la ejecución"))
