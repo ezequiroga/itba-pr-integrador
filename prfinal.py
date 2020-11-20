@@ -131,6 +131,11 @@ for i in range(cant1):
         crucex.append(xAcc2[i])
         crucey.append(yAcc2[i])
 
+plt.plot(crucex, crucey, 'k.')
+
+df = pd.DataFrame({'Fechas de inversion de valores': crucex})
+df.to_excel("cruces.xlsx")
+
 plt.xticks(xAcc1[ : :200]) # Mostrar una de cada 200 fechas
 plt.legend()
 plt.show()
