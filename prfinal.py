@@ -26,6 +26,16 @@ def isIdAccionIngresadoValido(id):
         return False
     return (1 <= id <= max)
 
+def isIdYaIngresado(idAccion):
+    """
+        Verifica si el ID ingresado ya fue ingresado.
+    """
+    try:
+        idA = accionesParaAnalizar[idAccion]
+        return True
+    except:
+        return False
+
 def isTrueOrFalse(txt):
     """
         Verifica que los valores associados a 'si' y 'no' sean correctos.
@@ -40,8 +50,11 @@ def ingresoUnIdAccion():
     idAccion = input()
     while (not isIdAccionIngresadoValido(idAccion)):
         print('{:-^30}'.format("Id inválido. Intente nuevamente:"), end =' ')
-        idAccion = input()    
-    accionesParaAnalizar[idAccion] = 1
+        idAccion = input()
+    if (isIdYaIngresado(idAccion)):
+        print('{:-^30}'.format("El id " + idAccion + " ya fue ingresado."))
+    else:
+        accionesParaAnalizar[idAccion] = 1
 
 def preguntarSeguirIngresando():
     """
