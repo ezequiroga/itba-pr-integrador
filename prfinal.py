@@ -2,6 +2,7 @@ import os
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.dates as dates
+import numpy as np
 
 nomAcciones = {}
 accionesParaAnalizar = {}
@@ -94,11 +95,21 @@ ingresoDeAccionesAAnalizar()
 
 print('\n{:*^50}\n'.format("Generado grafico..."))
 
+# Inicializacion de variables
 acciones = []
+dateInicioSeptiembre = np.datetime64('2020-09-01')
+dateInicioOctubre = np.datetime64('2020-10-01')
+dateInicioNombiembre = np.datetime64('2020-11-01')
+primerDiaSeptiembre = True
+primerDiaOctubre = True
+primerDiaNoviembre = True
+#############################
 
+# Recorro la lista de acciones elegidas
 for unId in accionesParaAnalizar:
     acciones.append(nomAcciones[int(unId)])
 
+# Apertura y de info de Accion 1
 archivo1 = pd.read_csv(getNombreArchivoAccion(acciones[0]))
 data1 = archivo1.to_dict("list")
 cant1 = len(data1["date"])
@@ -107,16 +118,39 @@ xAcc1 = []
 yAcc1 = []
 xDer1 = []
 yDer1 = []
+valoresInicioCierreMeses1 = []
 for i in range(cant1):
     xAcc1.append(data1["date"][i])
     yAcc1.append(data1["open"][i])
     if i > 0:
+        date=np.datetime64(data1["date"][i])
+
+        if dateInicioSeptiembre >= date and primerDiaSeptiembre:
+            valoresInicioCierreMeses1.append(data1["open"][i])
+            primerDiaSeptiembre = False
+
+        if dateInicioOctubre >= date and primerDiaOctubre:
+            valoresInicioCierreMeses1.append(data1["open"][i-1])
+            valoresInicioCierreMeses1.append(data1["open"][i])
+            primerDiaOctubre = False
+
+        if dateInicioNombiembre >= date and primerDiaNoviembre:
+            valoresInicioCierreMeses1.append(data1["open"][i-1])
+            primerDiaNoviembre = False
+
         xDer1.append(data1["date"][i])
         yDer1.append(data1["open"][i] - data1["open"][i-1])
 
 plt.plot(xAcc1, yAcc1, label = acciones[0])
 #plt.plot(xDer1, yDer1, 'm:', label = 'Derivadas ' + acciones[0])
 
+# Reset de variables
+primerDiaSeptiembre = True
+primerDiaOctubre = True
+primerDiaNoviembre = True
+#############################
+
+# Apertura y de info de Accion 2
 archivo2 = pd.read_csv(getNombreArchivoAccion(acciones[1]))
 data2 = archivo2.to_dict("list")
 cant2 = len(data2["date"])
@@ -125,16 +159,33 @@ xAcc2 = []
 yAcc2 = []
 xDer2 = []
 yDer2 = []
+valoresInicioCierreMeses2 = []
 for i in range(cant2):
     xAcc2.append(data2["date"][i])
     yAcc2.append(data2["open"][i])
     if i > 0:
+        date=np.datetime64(data2["date"][i])
+
+        if dateInicioSeptiembre >= date and primerDiaSeptiembre:
+            valoresInicioCierreMeses2.append(data2["open"][i])
+            primerDiaSeptiembre = False
+
+        if dateInicioOctubre >= date and primerDiaOctubre:
+            valoresInicioCierreMeses2.append(data2["open"][i-1])
+            valoresInicioCierreMeses2.append(data2["open"][i])
+            primerDiaOctubre = False
+
+        if dateInicioNombiembre >= date and primerDiaNoviembre:
+            valoresInicioCierreMeses2.append(data2["open"][i-1])
+            primerDiaNoviembre = False
+
         xDer2.append(data2["date"][i])
         yDer2.append(data2["open"][i] - data2["open"][i-1])
 
 plt.plot(xAcc2, yAcc2, label = acciones[1])
 #plt.plot(xDer2, yDer2, 'r--', label = 'Derivadas ' + acciones[1])
 
+# Calculo de cruces entre las acciones
 crucex = []
 crucey = []
 fechasCruce = []
@@ -146,17 +197,18 @@ for i in range(cant1):
         else:
             crucex.append(xAcc1[i])
             crucey.append(yAcc1[i])
-
 plt.plot(crucex, crucey, 'k.')
 
+# Generacion del excel con informacion de cruce entre valores
 df = pd.DataFrame({'Fechas de inversion de valores': crucex})
 df.to_excel("cruces.xlsx")
 
+# Impresion del grafico comparativo
 plt.xticks(xAcc1[ : :200]) # Mostrar una de cada 200 fechas
 plt.legend()
 plt.show()
 
-
+# Impresion del grafico de derivadas
 plt.plot(xDer1, yDer1, 'm:', label = 'Derivadas ' + acciones[0])
 plt.plot(xDer2, yDer2, 'r--', label = 'Derivadas ' + acciones[1])
 plt.xticks(xAcc1[ : :200]) # Mostrar una de cada 200 fechas
