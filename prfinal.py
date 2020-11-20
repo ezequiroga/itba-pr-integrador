@@ -1,7 +1,11 @@
 import os
+import pandas as pd
+import matplotlib.pyplot as plt
+import matplotlib.dates as dates
 
 nomAcciones = {}
 accionesParaAnalizar = {}
+cantidadMaximaDeAcciones = 2
 
 def getNomAcciones():
     """
@@ -67,6 +71,9 @@ def preguntarSeguirIngresando():
         tof = input()
     return tof
 
+def getNombreArchivoAccion(nom):
+    return 'stocks/' + nom + '.csv'
+
 def ingresoDeAccionesAAnalizar():
     """
         Inicia el proceso de ingreso de acciones por analizar
@@ -78,11 +85,52 @@ def ingresoDeAccionesAAnalizar():
         print(unaAccion, ':', nomAcciones[unaAccion])
 
     seguirIngresando = True
-    while (seguirIngresando):
+    while (seguirIngresando and len(accionesParaAnalizar) < cantidadMaximaDeAcciones):
         ingresoUnIdAccion()
-        tof = preguntarSeguirIngresando()
-        seguirIngresando = (tof == 's' or tof == 'S')
-
-
+        #tof = preguntarSeguirIngresando()
+        #seguirIngresando = (tof == 's' or tof == 'S')
 
 ingresoDeAccionesAAnalizar()
+
+print('\n{:*^50}\n'.format("Generado grafico..."))
+
+acciones = []
+
+for unId in accionesParaAnalizar:
+    acciones.append(nomAcciones[int(unId)])
+
+archivo1 = pd.read_csv(getNombreArchivoAccion(acciones[0]))
+data1 = archivo1.to_dict("list")
+cant1 = len(data1["date"])
+
+xAcc1 = []
+yAcc1 = []
+for i in range(cant1):
+    xAcc1.append(data1["date"][i])
+    yAcc1.append(data1["open"][i])
+
+plt.plot(xAcc1, yAcc1, label = acciones[0])
+
+archivo2 = pd.read_csv(getNombreArchivoAccion(acciones[1]))
+data2 = archivo2.to_dict("list")
+cant2 = len(data2["date"])
+
+xAcc2 = []
+yAcc2 = []
+for i in range(cant2):
+    xAcc2.append(data2["date"][i])
+    yAcc2.append(data2["open"][i])
+
+plt.plot(xAcc2, yAcc2, label = acciones[1])
+
+crucex = []
+crucey = []
+fechasCruce = []
+for i in range(cant1):
+    if i > 0 and ((yAcc1[i] == yAcc2[i]) or (yAcc1[i] > yAcc2[i] and yAcc1[i-1] < yAcc2[i-1]) or (yAcc1[i] < yAcc2[i] and yAcc1[i-1] > yAcc2[i-1])):
+        crucex.append(xAcc2[i])
+        crucey.append(yAcc2[i])
+
+plt.xticks(xAcc1[ : :200]) # Mostrar una de cada 200 fechas
+plt.legend()
+plt.show()
