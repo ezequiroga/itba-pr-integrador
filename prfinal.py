@@ -128,8 +128,12 @@ crucey = []
 fechasCruce = []
 for i in range(cant1):
     if i > 0 and ((yAcc1[i] == yAcc2[i]) or (yAcc1[i] > yAcc2[i] and yAcc1[i-1] < yAcc2[i-1]) or (yAcc1[i] < yAcc2[i] and yAcc1[i-1] > yAcc2[i-1])):
-        crucex.append(xAcc2[i])
-        crucey.append(yAcc2[i])
+        if yAcc2[i] >= yAcc1[i]:
+            crucex.append(xAcc2[i])
+            crucey.append(yAcc2[i])
+        else:
+            crucex.append(xAcc1[i])
+            crucey.append(yAcc1[i])
 
 plt.plot(crucex, crucey, 'k.')
 
@@ -139,3 +143,5 @@ df.to_excel("cruces.xlsx")
 plt.xticks(xAcc1[ : :200]) # Mostrar una de cada 200 fechas
 plt.legend()
 plt.show()
+
+print('\n{:*^50}\n'.format("Fin de la ejecución"))
