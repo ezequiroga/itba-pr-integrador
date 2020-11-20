@@ -105,11 +105,17 @@ cant1 = len(data1["date"])
 
 xAcc1 = []
 yAcc1 = []
+xDer1 = []
+yDer1 = []
 for i in range(cant1):
     xAcc1.append(data1["date"][i])
     yAcc1.append(data1["open"][i])
+    if i > 0:
+        xDer1.append(data1["date"][i])
+        yDer1.append(data1["open"][i] - data1["open"][i-1])
 
 plt.plot(xAcc1, yAcc1, label = acciones[0])
+#plt.plot(xDer1, yDer1, 'm:', label = 'Derivadas ' + acciones[0])
 
 archivo2 = pd.read_csv(getNombreArchivoAccion(acciones[1]))
 data2 = archivo2.to_dict("list")
@@ -117,11 +123,17 @@ cant2 = len(data2["date"])
 
 xAcc2 = []
 yAcc2 = []
+xDer2 = []
+yDer2 = []
 for i in range(cant2):
     xAcc2.append(data2["date"][i])
     yAcc2.append(data2["open"][i])
+    if i > 0:
+        xDer2.append(data2["date"][i])
+        yDer2.append(data2["open"][i] - data2["open"][i-1])
 
 plt.plot(xAcc2, yAcc2, label = acciones[1])
+#plt.plot(xDer2, yDer2, 'r--', label = 'Derivadas ' + acciones[1])
 
 crucex = []
 crucey = []
@@ -140,6 +152,13 @@ plt.plot(crucex, crucey, 'k.')
 df = pd.DataFrame({'Fechas de inversion de valores': crucex})
 df.to_excel("cruces.xlsx")
 
+plt.xticks(xAcc1[ : :200]) # Mostrar una de cada 200 fechas
+plt.legend()
+plt.show()
+
+
+plt.plot(xDer1, yDer1, 'm:', label = 'Derivadas ' + acciones[0])
+plt.plot(xDer2, yDer2, 'r--', label = 'Derivadas ' + acciones[1])
 plt.xticks(xAcc1[ : :200]) # Mostrar una de cada 200 fechas
 plt.legend()
 plt.show()
