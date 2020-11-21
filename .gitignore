@@ -1,2 +1,2 @@
-*.xlsx
-gen*.png
+/*.xlsx
+/gen*.png
