@@ -10,6 +10,9 @@ nomAcciones = {}
 accionesParaAnalizar = {}
 cantidadMaximaDeAcciones = 2
 
+rangoFechaDesde = 0
+rangoFechaHasta = 0
+
 valoresInicioCierreMeses1 = []
 valoresInicioCierreMeses2 = []
 
@@ -97,10 +100,10 @@ def ingresoDeAccionesAAnalizar():
         #seguirIngresando = (tof == 's' or tof == 'S')
 
 def isValidFormatoFecha(fecha):
-    return (re.match('\\d{4}-{1}\\d{2}-{1}\\d{2}', fecha) == None)
+    return (re.match('\\d{4}-{1}\\d{2}-{1}\\d{2}', fecha) != None)
 
 def isFechaMenorHoy(fecha):
-    return (np.datetime64(fecha) < np.datetime64('today'))
+    return (np.datetime64(fecha) <= np.datetime64('today'))
 
 def ingresoFecha(tipo):
     formatoValido = False
@@ -114,19 +117,22 @@ def ingresoFecha(tipo):
             print("Formato inválido!")
             print("Ingrese la fecha " + tipo + " nuevamente: ", end = '')
             fecha = input()
+            formatoValido = isValidFormatoFecha(fecha)
         
         fechaMenorHoy = isFechaMenorHoy(fecha)
-        while not fechaMenorHoy:
+        if not fechaMenorHoy:
             print("La fecha ingresa no puede ser posterior a la de hoy!")
             print("Ingrese la fecha " + tipo + " nuevamente: ", end = '')
-        
-        fecha = input()
+            fecha = input()
     
     return fecha
 
 def ingresoDeRangoDeFechas():
     print('\n{:*^50}\n'.format("Ingreso de rango de fechas..."))
-    print('\n{:----^50}\n'.format("Debe ingresar las fechas con el siguiente formato AAAA-MM-DD"))
+    print('\n{:^50}\n'.format("+++ Debe ingresar las fechas con el siguiente formato AAAA-MM-DD +++"))
+
+    dateDesde = 0
+    dateHasta = 0
 
     rangoCorrecto = False
 
@@ -137,11 +143,12 @@ def ingresoDeRangoDeFechas():
         dateDesde = np.datetime64(fechaDesde)
         dateHasta = np.datetime64(fechaHasta)
 
-        rangoCorrecto = dateDesde < dateHasta
+        if dateDesde <= dateHasta:
+            rangoCorrecto = True
+        else:
+            print("La fecha DESDE del rango no puede ser mayor a la fecha HASTA!\n")
     
-
-
-
+    return dateDesde, dateHasta
 
 def getAccionesParaAnlizar():
     acciones = []
@@ -381,12 +388,14 @@ def calcularDerivadasDiscretas():
 
 print('\n{:*^50}\n'.format("Inicio de la ejecución..."))
 
-ingresoDeAccionesAAnalizar()
+#ingresoDeAccionesAAnalizar()
 
-generarGraficoComparativo()
+rangoFechaDesde, rangoFechaHasta = ingresoDeRangoDeFechas()
 
-generarExcelDiferencias()
+#generarGraficoComparativo()
 
-calcularDerivadasDiscretas()
+#generarExcelDiferencias()
+
+#calcularDerivadasDiscretas()
 
 print('\n{:*^50}\n'.format("Fin de la ejecución"))
