@@ -227,7 +227,10 @@ def generarGraficoComparativo():
         plt.xticks(xAcc1[ : :500], rotation=45) # Mostrar una de cada 500 fechas
     else:
         plt.xticks(xAcc2[ : :500], rotation=45) # Mostrar una de cada 500 fechas
+
     plt.legend()
+
+    plt.savefig('gen-comparativo-' + acciones[0] + '-' + acciones[1] + '.png')
     plt.show()
 
 def generarExcelDiferencias():
@@ -304,10 +307,13 @@ def calcularDerivadasDiscretas():
         xDer1.append(data1["Date"][i])
         yDer1.append(data1["Open"][i-1] - data1["Open"][i])
     
-    print('\n{:*^50}\n'.format("Graficando derivadas de " + acciones[0] + "..."))
+    
     plt.plot(xDer1, yDer1, 'm:', label = 'Derivadas ' + acciones[0])
     plt.xticks(xDer1[ : :500], rotation=45) # Mostrar una de cada 500 fechas
     plt.legend()
+    print('\n{:*^50}\n'.format("Guardando gráfico de derivadas de " + acciones[0] + "..."))
+    plt.savefig('gen-derivadas-' + acciones[0] + '.png')
+    print('\n{:*^50}\n'.format("Graficando derivadas de " + acciones[0] + "..."))
     plt.show()
 
     print('\n{:*^50}\n'.format("Calculando derivadas de " + acciones[1] + "..."))
@@ -317,13 +323,15 @@ def calcularDerivadasDiscretas():
         xDer2.append(data2["Date"][i])
         yDer2.append(data2["Open"][i-1] - data2["Open"][i])
     
-    print('\n{:*^50}\n'.format("Graficando derivadas de " + acciones[1] + "..."))
     plt.plot(xDer2, yDer2, 'm:', label = 'Derivadas ' + acciones[1])
     plt.xticks(xDer2[ : :500], rotation=45) # Mostrar una de cada 500 fechas
     plt.legend()
+    print('\n{:*^50}\n'.format("Guardando grafico de derivadas de " + acciones[1] + "..."))
+    plt.savefig('gen-derivadas-' + acciones[1] + '.png')
+    print('\n{:*^50}\n'.format("Graficando derivadas de " + acciones[1] + "..."))
     plt.show()
 
-print('\n{:*^50}\n'.format("Unicio de la ejecucion..."))
+print('\n{:*^50}\n'.format("Inicio de la ejecución..."))
 
 ingresoDeAccionesAAnalizar()
 
