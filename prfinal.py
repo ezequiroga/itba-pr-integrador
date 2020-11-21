@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as dates
 import numpy as np
 
-pathStocks = 'stocks/'
+pathStocks = 'currentStocks/'
 nomAcciones = {}
 accionesParaAnalizar = {}
 cantidadMaximaDeAcciones = 2
@@ -98,9 +98,9 @@ print('\n{:*^50}\n'.format("Generado grafico..."))
 
 # Inicializacion de variables
 acciones = []
-dateInicioSeptiembre = np.datetime64('2005-09-01')
-dateInicioOctubre = np.datetime64('2005-10-01')
-dateInicioNombiembre = np.datetime64('2005-11-01')
+dateInicioSeptiembre = np.datetime64('2020-09-01')
+dateInicioOctubre = np.datetime64('2020-10-01')
+dateInicioNombiembre = np.datetime64('2020-11-01')
 primerDiaSeptiembre = True
 primerDiaOctubre = True
 primerDiaNoviembre = True
