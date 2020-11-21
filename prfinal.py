@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as dates
 import numpy as np
 
+pathStocks = 'stocks/'
 nomAcciones = {}
 accionesParaAnalizar = {}
 cantidadMaximaDeAcciones = 2
@@ -13,7 +14,7 @@ def getNomAcciones():
         Recorre el directorio de acciones y obtiene los nombres a partir de los nombres de los archivos.
     """
     if (len(nomAcciones) == 0):
-        arcAcciones = os.listdir('stocks/')
+        arcAcciones = os.listdir(pathStocks)
 
         for i, unaAcc in enumerate(arcAcciones):
             nomAcciones[i+1] = unaAcc.split('.')[0]
