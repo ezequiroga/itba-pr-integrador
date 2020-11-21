@@ -293,6 +293,36 @@ def generarExcelDiferencias():
     df = pd.DataFrame.from_dict(infoVariaciones, orient='index')
     df.to_excel("variaciones.xlsx")
 
+def calcularDerivadasDiscretas():
+    data1, data2 = aperturaArchivoAcciones()
+    acciones = getAccionesParaAnlizar()
+    
+    print('\n{:*^50}\n'.format("Calculando derivadas de " + acciones[0] + "..."))
+    xDer1 = []
+    yDer1 = []
+    for i in range(1,len(data1["Date"])):
+        xDer1.append(data1["Date"][i])
+        yDer1.append(data1["Open"][i-1] - data1["Open"][i])
+    
+    print('\n{:*^50}\n'.format("Graficando derivadas de " + acciones[0] + "..."))
+    plt.plot(xDer1, yDer1, 'm:', label = 'Derivadas ' + acciones[0])
+    plt.xticks(xDer1[ : :500], rotation=45) # Mostrar una de cada 500 fechas
+    plt.legend()
+    plt.show()
+
+    print('\n{:*^50}\n'.format("Calculando derivadas de " + acciones[1] + "..."))
+    xDer2 = []
+    yDer2 = []
+    for i in range(1,len(data2["Date"])):
+        xDer2.append(data2["Date"][i])
+        yDer2.append(data2["Open"][i-1] - data2["Open"][i])
+    
+    print('\n{:*^50}\n'.format("Graficando derivadas de " + acciones[1] + "..."))
+    plt.plot(xDer2, yDer2, 'm:', label = 'Derivadas ' + acciones[1])
+    plt.xticks(xDer2[ : :500], rotation=45) # Mostrar una de cada 500 fechas
+    plt.legend()
+    plt.show()
+
 print('\n{:*^50}\n'.format("Unicio de la ejecucion..."))
 
 ingresoDeAccionesAAnalizar()
@@ -300,5 +330,7 @@ ingresoDeAccionesAAnalizar()
 generarGraficoComparativo()
 
 generarExcelDiferencias()
+
+calcularDerivadasDiscretas()
 
 print('\n{:*^50}\n'.format("Fin de la ejecución"))
