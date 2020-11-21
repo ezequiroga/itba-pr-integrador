@@ -9,9 +9,6 @@ nomAcciones = {}
 accionesParaAnalizar = {}
 cantidadMaximaDeAcciones = 2
 
-data1 = {}
-data2 = {}
-
 valoresInicioCierreMeses1 = []
 valoresInicioCierreMeses2 = []
 
@@ -105,6 +102,7 @@ def getAccionesParaAnlizar():
     return acciones
 
 def aperturaArchivoAcciones():
+    print('\n{:*^50}\n'.format("Abriendo archivos de acciones..."))
     acciones = getAccionesParaAnlizar()
 
     archivo1 = pd.read_csv(getNombreArchivoAccion(acciones[0]))
@@ -113,10 +111,14 @@ def aperturaArchivoAcciones():
     archivo2 = pd.read_csv(getNombreArchivoAccion(acciones[1]))
     data2 = archivo2.to_dict("list")
 
+    return data1, data2
+
 def generarGraficoComparativo():
     print('\n{:*^50}\n'.format("Analizando acciones..."))
 
     # Inicializacion de variables
+    acciones = getAccionesParaAnlizar()
+
     dateFinAgosto = np.datetime64('2020-09-30')
     dateFinSeptiembre = np.datetime64('2020-09-30')
     dateFinOctubre = np.datetime64('2020-10-31')
@@ -126,7 +128,11 @@ def generarGraficoComparativo():
     ultimoDiaOctubre = True
     #############################
 
+    data1, data2 = aperturaArchivoAcciones()
+
     # Info de Accion 1
+    #archivo1 = pd.read_csv(getNombreArchivoAccion(acciones[0]))
+    #data1 = archivo1.to_dict("list")
     cant1 = len(data1["Date"])
     dateReverse1 = data1["Date"][::-1]
     stocksReverse1 = data1["Open"][::-1]
@@ -134,6 +140,8 @@ def generarGraficoComparativo():
     yAcc1 = []
 
     # Info de Accion 2
+    #archivo2 = pd.read_csv(getNombreArchivoAccion(acciones[1]))
+    #data2 = archivo2.to_dict("list")
     cant2 = len(data2["Date"])
     dateReverse2 = data2["Date"][::-1]
     stocksReverse2 = data2["Open"][::-1]
@@ -283,7 +291,7 @@ def generarExcelDiferencias():
     df.to_excel("variaciones.xlsx")
 
 def calcularDerivadasDiscretas():
-
+    pass
 
 print('\n{:*^50}\n'.format("Unicio de la ejecucion..."))
 
