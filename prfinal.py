@@ -99,24 +99,49 @@ def ingresoDeAccionesAAnalizar():
 def isValidFormatoFecha(fecha):
     return (re.match('\\d{4}-{1}\\d{2}-{1}\\d{2}', fecha) == None)
 
+def isFechaMenorHoy(fecha):
+    return (np.datetime64(fecha) < np.datetime64('today'))
+
+def ingresoFecha(tipo):
+    formatoValido = False
+    fechaMenorHoy = False
+
+    print("Ingrese la fecha " + tipo + ": ", end = '')
+    fecha = input()
+    while (not formatoValido or not fechaMenorHoy):
+        formatoValido = isValidFormatoFecha(fecha)
+        while not formatoValido:
+            print("Formato inválido!")
+            print("Ingrese la fecha " + tipo + " nuevamente: ", end = '')
+            fecha = input()
+        
+        fechaMenorHoy = isFechaMenorHoy(fecha)
+        while not fechaMenorHoy:
+            print("La fecha ingresa no puede ser posterior a la de hoy!")
+            print("Ingrese la fecha " + tipo + " nuevamente: ", end = '')
+        
+        fecha = input()
+    
+    return fecha
+
 def ingresoDeRangoDeFechas():
     print('\n{:*^50}\n'.format("Ingreso de rango de fechas..."))
     print('\n{:----^50}\n'.format("Debe ingresar las fechas con el siguiente formato AAAA-MM-DD"))
 
-    print("Ingrese la fecha desde: ", end = '')
-    fechaDesde = input()
-    while not isValidFormatoFecha(fechaDesde):
-        print("Formato inválido!")
-        print("Ingrese la fecha DESDE nuevamente: ", end = '')
-        fechaDesde = input()
+    rangoCorrecto = False
+
+    while not rangoCorrecto:
+        fechaDesde = ingresoFecha('DESDE')
+        fechaHasta = ingresoFecha('HASTA')
+        
+        dateDesde = np.datetime64(fechaDesde)
+        dateHasta = np.datetime64(fechaHasta)
+
+        rangoCorrecto = dateDesde < dateHasta
+    
 
 
-    print("Ingrese la fecha hasta: ", end = '')
-    fechaHasta = input()
-    while not isValidFormatoFecha(fechaHasta):
-        print("Formato inválido!")
-        print("Ingrese la fecha HASTA nuevamente: ", end = '')
-        fechaHasta = input()
+
 
 def getAccionesParaAnlizar():
     acciones = []
