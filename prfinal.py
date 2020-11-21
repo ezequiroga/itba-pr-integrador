@@ -74,7 +74,7 @@ def preguntarSeguirIngresando():
     return tof
 
 def getNombreArchivoAccion(nom):
-    return 'stocks/' + nom + '.csv'
+    return pathStocks + nom + '.csv'
 
 def ingresoDeAccionesAAnalizar():
     """
