@@ -223,7 +223,10 @@ def generarGraficoComparativo():
 
     # Impresion del grafico comparativo
     print('\n{:*^50}\n'.format("Generando gráfico comparativo..."))
-    plt.xticks(xAcc1[ : :4000]) # Mostrar una de cada 4000 fechas
+    if cant1 >= cant2:
+        plt.xticks(xAcc1[ : :500], rotation=45) # Mostrar una de cada 500 fechas
+    else:
+        plt.xticks(xAcc2[ : :500], rotation=45) # Mostrar una de cada 500 fechas
     plt.legend()
     plt.show()
 
@@ -289,9 +292,6 @@ def generarExcelDiferencias():
     print('\n{:*^50}\n'.format("Generando excel de alzas y bajas..."))
     df = pd.DataFrame.from_dict(infoVariaciones, orient='index')
     df.to_excel("variaciones.xlsx")
-
-def calcularDerivadasDiscretas():
-    pass
 
 print('\n{:*^50}\n'.format("Unicio de la ejecucion..."))
 
