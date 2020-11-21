@@ -160,11 +160,17 @@ def aperturaArchivoAcciones():
     print('\n{:*^50}\n'.format("Abriendo archivos de acciones..."))
     acciones = getAccionesParaAnlizar()
 
+    print('\n{:=>50}\n'.format("Abriendo archivo de " + acciones[0]))
     archivo1 = pd.read_csv(getNombreArchivoAccion(acciones[0]))
-    data1 = archivo1.to_dict("list")
+    archivo1FiltradoDesde = archivo1[archivo1.apply(lambda x: np.datetime64(x['Date']) >= rangoFechaDesde, axis = 1 )]
+    archivo1FiltradoHasta = archivo1FiltradoDesde[archivo1FiltradoDesde.apply(lambda x: np.datetime64(x['Date']) <= rangoFechaHasta, axis = 1 )]
+    data1 = archivo1FiltradoHasta.to_dict("list")
 
+    print('\n{:=>50}\n'.format("Abriendo archivo de " + acciones[1]))
     archivo2 = pd.read_csv(getNombreArchivoAccion(acciones[1]))
-    data2 = archivo2.to_dict("list")
+    archivo2FiltradoDesde = archivo2[archivo2.apply(lambda x: np.datetime64(x['Date']) >= rangoFechaDesde, axis = 1 )]
+    archivo2FiltradoHasta = archivo2FiltradoDesde[archivo2FiltradoDesde.apply(lambda x: np.datetime64(x['Date']) <= rangoFechaHasta, axis = 1 )]
+    data2 = archivo2FiltradoHasta.to_dict("list")
 
     return data1, data2
 
@@ -388,14 +394,14 @@ def calcularDerivadasDiscretas():
 
 print('\n{:*^50}\n'.format("Inicio de la ejecución..."))
 
-#ingresoDeAccionesAAnalizar()
+ingresoDeAccionesAAnalizar()
 
 rangoFechaDesde, rangoFechaHasta = ingresoDeRangoDeFechas()
 
-#generarGraficoComparativo()
+generarGraficoComparativo()
 
-#generarExcelDiferencias()
+generarExcelDiferencias()
 
-#calcularDerivadasDiscretas()
+calcularDerivadasDiscretas()
 
 print('\n{:*^50}\n'.format("Fin de la ejecución"))
