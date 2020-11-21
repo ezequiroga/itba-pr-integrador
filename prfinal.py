@@ -98,12 +98,14 @@ print('\n{:*^50}\n'.format("Generado grafico..."))
 
 # Inicializacion de variables
 acciones = []
-dateInicioSeptiembre = np.datetime64('2020-09-01')
-dateInicioOctubre = np.datetime64('2020-10-01')
-dateInicioNombiembre = np.datetime64('2020-11-01')
-primerDiaSeptiembre = True
-primerDiaOctubre = True
-primerDiaNoviembre = True
+
+dateFinAgosto = np.datetime64('2020-09-30')
+dateFinSeptiembre = np.datetime64('2020-09-30')
+dateFinOctubre = np.datetime64('2020-10-31')
+
+ultimoDiaAgosto = True
+ultimoDiaSeptiembre = True
+ultimoDiaOctubre = True
 #############################
 
 # Recorro la lista de acciones elegidas
@@ -114,77 +116,71 @@ for unId in accionesParaAnalizar:
 archivo1 = pd.read_csv(getNombreArchivoAccion(acciones[0]))
 data1 = archivo1.to_dict("list")
 cant1 = len(data1["Date"])
-
+dateReverse1 = data1["Date"][::-1]
+stocksReverse1 = data1["Open"][::-1]
 xAcc1 = []
 yAcc1 = []
-xDer1 = []
-yDer1 = []
 valoresInicioCierreMeses1 = []
-for i in range(cant1):
-    xAcc1.append(data1["Date"][i])
-    yAcc1.append(data1["Open"][i])
-    if i > 0:
-        date=np.datetime64(data1["Date"][i])
 
-        if date >= dateInicioSeptiembre and primerDiaSeptiembre:
-            valoresInicioCierreMeses1.append(data1["Open"][i])
-            primerDiaSeptiembre = False
-
-        if date >= dateInicioOctubre and primerDiaOctubre:
-            valoresInicioCierreMeses1.append(data1["Open"][i-1])
-            valoresInicioCierreMeses1.append(data1["Open"][i])
-            primerDiaOctubre = False
-
-        if date >= dateInicioNombiembre and primerDiaNoviembre:
-            valoresInicioCierreMeses1.append(data1["Open"][i-1])
-            primerDiaNoviembre = False
-
-        xDer1.append(data1["Date"][i])
-        yDer1.append(data1["Open"][i] - data1["Open"][i-1])
-
-plt.plot(xAcc1, yAcc1, label = acciones[0])
-#plt.plot(xDer1, yDer1, 'm:', label = 'Derivadas ' + acciones[0])
-
-# Reset de variables
-primerDiaSeptiembre = True
-primerDiaOctubre = True
-primerDiaNoviembre = True
-#############################
-
-# Apertura y de info de Accion 2
 archivo2 = pd.read_csv(getNombreArchivoAccion(acciones[1]))
 data2 = archivo2.to_dict("list")
 cant2 = len(data2["Date"])
-
+dateReverse2 = data2["Date"][::-1]
+stocksReverse2 = data2["Open"][::-1]
 xAcc2 = []
 yAcc2 = []
-xDer2 = []
-yDer2 = []
 valoresInicioCierreMeses2 = []
-for i in range(cant2):
-    xAcc2.append(data2["Date"][i])
-    yAcc2.append(data2["Open"][i])
-    if i > 0:
-        date=np.datetime64(data2["Date"][i])
 
-        if date >= dateInicioSeptiembre and primerDiaSeptiembre:
-            valoresInicioCierreMeses2.append(data2["Open"][i])
-            primerDiaSeptiembre = False
+cantAcciones = cant1
+minimoAcciones = cant2
+if cant1 < cant2 : cantAcciones = cant2
+if cant1 < cant2 : minimoAcciones = cant1
 
-        if date >= dateInicioOctubre and primerDiaOctubre:
-            valoresInicioCierreMeses2.append(data2["Open"][i-1])
-            valoresInicioCierreMeses2.append(data2["Open"][i])
-            primerDiaOctubre = False
+for i in range(cantAcciones):
+    try:
+        xAcc1.append(dateReverse1[i])
+        yAcc1.append(stocksReverse1[i])
+    except:
+        xAcc1.append(dateReverse2[i])
+        yAcc1.append(0)
+    
+    try:
+        xAcc2.append(dateReverse2[i])
+        yAcc2.append(stocksReverse2[i])
+    except:
+        xAcc2.append(dateReverse1[i])
+        yAcc2.append(0)
 
-        if date >= dateInicioNombiembre and primerDiaNoviembre:
-            valoresInicioCierreMeses2.append(data2["Open"][i-1])
-            primerDiaNoviembre = False
+    if minimoAcciones > i > 0:
+        try:
+            date=np.datetime64(dateReverse1[i])
 
-        xDer2.append(data2["Date"][i])
-        yDer2.append(data2["Open"][i] - data2["Open"][i-1])
+            if date <= dateFinOctubre and ultimoDiaOctubre:
+                valoresInicioCierreMeses1.append(stocksReverse1[i])
+                valoresInicioCierreMeses2.append(stocksReverse2[i])
+                ultimoDiaOctubre = False
 
+            if date <= dateFinSeptiembre and ultimoDiaSeptiembre:
+                valoresInicioCierreMeses1.append(stocksReverse1[i-1])
+                valoresInicioCierreMeses2.append(stocksReverse2[i-1])
+                valoresInicioCierreMeses1.append(stocksReverse1[i])
+                valoresInicioCierreMeses2.append(stocksReverse2[i])
+                ultimoDiaSeptiembre = False
+            
+            if date <= dateFinAgosto and ultimoDiaAgosto:
+                valoresInicioCierreMeses1.append(stocksReverse1[i-1])
+                valoresInicioCierreMeses2.append(stocksReverse2[i-1])
+                ultimoDiaAgosto = False
+        except:
+            pass
+
+xAcc1.reverse()
+yAcc1.reverse()
+plt.plot(xAcc1, yAcc1, label = acciones[0])
+
+xAcc2.reverse()
+yAcc2.reverse()
 plt.plot(xAcc2, yAcc2, label = acciones[1])
-#plt.plot(xDer2, yDer2, 'r--', label = 'Derivadas ' + acciones[1])
 
 # Calculo de cruces entre las acciones
 crucex = []
@@ -205,23 +201,18 @@ df = pd.DataFrame({'Fechas de inversion de valores': crucex})
 df.to_excel("cruces.xlsx")
 
 # Impresion del grafico comparativo
-plt.xticks(xAcc1[ : :200]) # Mostrar una de cada 200 fechas
+plt.xticks(xAcc1[ : :4000]) # Mostrar una de cada 4000 fechas
 plt.legend()
 plt.show()
 
-# Impresion del grafico de derivadas
-plt.plot(xDer1, yDer1, 'm:', label = 'Derivadas ' + acciones[0])
-plt.plot(xDer2, yDer2, 'r--', label = 'Derivadas ' + acciones[1])
-plt.xticks(xAcc1[ : :200]) # Mostrar una de cada 200 fechas
-plt.legend()
-plt.show()
+
 
 # Calculo de que accion creo mas en diferentes periodos
-difAcc1Sep = valoresInicioCierreMeses1[1] - valoresInicioCierreMeses1[0]
-difAcc1Oct = valoresInicioCierreMeses1[3] - valoresInicioCierreMeses1[2]
+difAcc1Sep = valoresInicioCierreMeses1[2] - valoresInicioCierreMeses1[3]
+difAcc1Oct = valoresInicioCierreMeses1[0] - valoresInicioCierreMeses1[1]
 
-difAcc2Sep = valoresInicioCierreMeses2[1] - valoresInicioCierreMeses2[0]
-difAcc2Oct = valoresInicioCierreMeses2[3] - valoresInicioCierreMeses2[2]
+difAcc2Sep = valoresInicioCierreMeses2[2] - valoresInicioCierreMeses2[3]
+difAcc2Oct = valoresInicioCierreMeses2[0] - valoresInicioCierreMeses2[1]
 
 textoCrecimientoSep = ''
 if difAcc1Sep > difAcc2Sep:
