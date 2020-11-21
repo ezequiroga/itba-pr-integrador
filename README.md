@@ -11,6 +11,8 @@ La funcionalidad es la siguiente:
 5. Se calculan las derivadas discretas de cada acción.
 6. Se guardan y muestran en pantalla los gráficos cada una de las derivadas calculadas.
 
+`Todos los archivos son generados en la carpeta raiz del proyecto.`
+
 En la carpeta **currentStocks** están las acciones utilizadas para el ejercicio. Cada CSV contiene el historial completo hasta el 20/11/2020 de las cotizaciones repectivas. Todos los CSV furon descargados de la página de [Yahoo Finance](https://finance.yahoo.com/)
 
 El archivos **grafico_comparativo_google_amazon.png** es el gráfico requerido y se realizó con el histórico completo de las cotizaciones de Amazon y Google hasta el 20/11/2020.
