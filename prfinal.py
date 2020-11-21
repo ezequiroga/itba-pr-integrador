@@ -113,7 +113,7 @@ for unId in accionesParaAnalizar:
 # Apertura y de info de Accion 1
 archivo1 = pd.read_csv(getNombreArchivoAccion(acciones[0]))
 data1 = archivo1.to_dict("list")
-cant1 = len(data1["date"])
+cant1 = len(data1["Date"])
 
 xAcc1 = []
 yAcc1 = []
@@ -121,26 +121,26 @@ xDer1 = []
 yDer1 = []
 valoresInicioCierreMeses1 = []
 for i in range(cant1):
-    xAcc1.append(data1["date"][i])
-    yAcc1.append(data1["open"][i])
+    xAcc1.append(data1["Date"][i])
+    yAcc1.append(data1["Open"][i])
     if i > 0:
-        date=np.datetime64(data1["date"][i])
+        date=np.datetime64(data1["Date"][i])
 
         if date >= dateInicioSeptiembre and primerDiaSeptiembre:
-            valoresInicioCierreMeses1.append(data1["open"][i])
+            valoresInicioCierreMeses1.append(data1["Open"][i])
             primerDiaSeptiembre = False
 
         if date >= dateInicioOctubre and primerDiaOctubre:
-            valoresInicioCierreMeses1.append(data1["open"][i-1])
-            valoresInicioCierreMeses1.append(data1["open"][i])
+            valoresInicioCierreMeses1.append(data1["Open"][i-1])
+            valoresInicioCierreMeses1.append(data1["Open"][i])
             primerDiaOctubre = False
 
         if date >= dateInicioNombiembre and primerDiaNoviembre:
-            valoresInicioCierreMeses1.append(data1["open"][i-1])
+            valoresInicioCierreMeses1.append(data1["Open"][i-1])
             primerDiaNoviembre = False
 
-        xDer1.append(data1["date"][i])
-        yDer1.append(data1["open"][i] - data1["open"][i-1])
+        xDer1.append(data1["Date"][i])
+        yDer1.append(data1["Open"][i] - data1["Open"][i-1])
 
 plt.plot(xAcc1, yAcc1, label = acciones[0])
 #plt.plot(xDer1, yDer1, 'm:', label = 'Derivadas ' + acciones[0])
@@ -154,7 +154,7 @@ primerDiaNoviembre = True
 # Apertura y de info de Accion 2
 archivo2 = pd.read_csv(getNombreArchivoAccion(acciones[1]))
 data2 = archivo2.to_dict("list")
-cant2 = len(data2["date"])
+cant2 = len(data2["Date"])
 
 xAcc2 = []
 yAcc2 = []
@@ -162,26 +162,26 @@ xDer2 = []
 yDer2 = []
 valoresInicioCierreMeses2 = []
 for i in range(cant2):
-    xAcc2.append(data2["date"][i])
-    yAcc2.append(data2["open"][i])
+    xAcc2.append(data2["Date"][i])
+    yAcc2.append(data2["Open"][i])
     if i > 0:
-        date=np.datetime64(data2["date"][i])
+        date=np.datetime64(data2["Date"][i])
 
         if date >= dateInicioSeptiembre and primerDiaSeptiembre:
-            valoresInicioCierreMeses2.append(data2["open"][i])
+            valoresInicioCierreMeses2.append(data2["Open"][i])
             primerDiaSeptiembre = False
 
         if date >= dateInicioOctubre and primerDiaOctubre:
-            valoresInicioCierreMeses2.append(data2["open"][i-1])
-            valoresInicioCierreMeses2.append(data2["open"][i])
+            valoresInicioCierreMeses2.append(data2["Open"][i-1])
+            valoresInicioCierreMeses2.append(data2["Open"][i])
             primerDiaOctubre = False
 
         if date >= dateInicioNombiembre and primerDiaNoviembre:
-            valoresInicioCierreMeses2.append(data2["open"][i-1])
+            valoresInicioCierreMeses2.append(data2["Open"][i-1])
             primerDiaNoviembre = False
 
-        xDer2.append(data2["date"][i])
-        yDer2.append(data2["open"][i] - data2["open"][i-1])
+        xDer2.append(data2["Date"][i])
+        yDer2.append(data2["Open"][i] - data2["Open"][i-1])
 
 plt.plot(xAcc2, yAcc2, label = acciones[1])
 #plt.plot(xDer2, yDer2, 'r--', label = 'Derivadas ' + acciones[1])
