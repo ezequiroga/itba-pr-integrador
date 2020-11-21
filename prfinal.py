@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.dates as dates
 import numpy as np
+import re
 
 pathStocks = 'currentStocks/'
 nomAcciones = {}
@@ -94,6 +95,28 @@ def ingresoDeAccionesAAnalizar():
         ingresoUnIdAccion()
         #tof = preguntarSeguirIngresando()
         #seguirIngresando = (tof == 's' or tof == 'S')
+
+def isValidFormatoFecha(fecha):
+    return (re.match('\\d{4}-{1}\\d{2}-{1}\\d{2}', fecha) == None)
+
+def ingresoDeRangoDeFechas():
+    print('\n{:*^50}\n'.format("Ingreso de rango de fechas..."))
+    print('\n{:----^50}\n'.format("Debe ingresar las fechas con el siguiente formato AAAA-MM-DD"))
+
+    print("Ingrese la fecha desde: ", end = '')
+    fechaDesde = input()
+    while not isValidFormatoFecha(fechaDesde):
+        print("Formato inválido!")
+        print("Ingrese la fecha DESDE nuevamente: ", end = '')
+        fechaDesde = input()
+
+
+    print("Ingrese la fecha hasta: ", end = '')
+    fechaHasta = input()
+    while not isValidFormatoFecha(fechaHasta):
+        print("Formato inválido!")
+        print("Ingrese la fecha HASTA nuevamente: ", end = '')
+        fechaHasta = input()
 
 def getAccionesParaAnlizar():
     acciones = []
