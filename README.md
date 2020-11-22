@@ -18,7 +18,7 @@ El archivos **grafico_comparativo_google_amazon.png** es el gráfico requerido y
 1. Se eligen de forma autmática las acciones de Google y Amazon
 2. Se le solicita al usuario ingresar el rango de fechas a ser analizado.
 
-Los pasos siguientes se ejecutan sobre el rango seleccionado
+Los pasos siguientes se ejecutan sobre el rango seleccionado:
 
 3. Se calculan las intersecciones entre las cotizaciones de ambas acciones.
 4. Se guarda un excel con el listado de las fechas en las que ocurrieron las intersecciones.
