@@ -442,19 +442,25 @@ def calcularDerivadasDiscretas():
 
 print('\n{:*^50}\n'.format("Inicio de la ejecución..."))
 
-ingreso = 0
+ingreso = -1
 seguirOperando = True
 
 while(seguirOperando):
     
     print("----- Ingrese una opcion -----")
+    print("0: Ver ayuda")
     print("1: Comparación entre Amazon y Google")
-    print("2: Comparar 2 acciones a eleccion")    
-    while ingreso != '1' and ingreso != '2':
-        print("Ingrese una opción: ", end= ' ')
+    print("2: Comparar 2 acciones a eleccion")
+    while ingreso != '0' and ingreso != '1' and ingreso != '2':
+        print("Ingrese una opción:", end= ' ')
         ingreso = input()
 
-    if ingreso == '1':
+    if ingreso == '0':
+        print('\n')
+        with open('README.md') as fAyuda:
+            print(fAyuda.read())
+
+    elif ingreso == '1':
         accionesParaAnalizarNombre.append('AMZN')
         accionesParaAnalizarNombre.append('GOOG')
 
@@ -476,11 +482,11 @@ while(seguirOperando):
 
         calcularDerivadasDiscretas()
     
-    ingreso = 0
+    ingreso = -1
     seguir = 0
     while seguir != '1' and seguir != '2':
         print("----- Desea seguir operando? -----")
-        print("1: Si / 2: No", end = ' ')
+        print("1 -> Si / 2 -> No:", end = ' ')
         seguir = input()
     if seguir == '1':
         seguirOperando = True
