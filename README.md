@@ -6,6 +6,8 @@ El programa tiene dos modos de funcionamiento:
 1. Comparación entre Amazon y Google, dando la posibilidad al usuario de ingresra un rango de fechas
 2. Comparación entre dos acciones elegidas por el usuario
 
+El programa permite seguir operando hasta que el usuario escriba el codigo de salida.
+
 `Todos los archivos son generados en la carpeta raiz del proyecto.`
 
 En la carpeta **currentStocks** están las acciones utilizadas para el ejercicio. Cada CSV contiene el historial completo hasta el 20/11/2020 de las cotizaciones repectivas. Todos los CSV furon descargados de la página de [Yahoo Finance](https://finance.yahoo.com/)
