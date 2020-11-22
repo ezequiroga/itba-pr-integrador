@@ -3,11 +3,16 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.dates as dates
 import numpy as np
+import re
 
 pathStocks = 'currentStocks/'
 nomAcciones = {}
 accionesParaAnalizar = {}
+accionesParaAnalizarNombre = []
 cantidadMaximaDeAcciones = 2
+
+rangoFechaDesde = 0
+rangoFechaHasta = 0
 
 valoresInicioCierreMeses1 = []
 valoresInicioCierreMeses2 = []
@@ -95,21 +100,81 @@ def ingresoDeAccionesAAnalizar():
         #tof = preguntarSeguirIngresando()
         #seguirIngresando = (tof == 's' or tof == 'S')
 
+def isValidFormatoFecha(fecha):
+    return (re.match('\\d{4}-{1}\\d{2}-{1}\\d{2}', fecha) != None)
+
+def isFechaMenorHoy(fecha):
+    return (np.datetime64(fecha) <= np.datetime64('today'))
+
+def ingresoFecha(tipo):
+    formatoValido = False
+    fechaMenorHoy = False
+
+    print("Ingrese la fecha " + tipo + ": ", end = '')
+    fecha = input()
+    while (not formatoValido or not fechaMenorHoy):
+        formatoValido = isValidFormatoFecha(fecha)
+        while not formatoValido:
+            print("Formato inválido!")
+            print("Ingrese la fecha " + tipo + " nuevamente: ", end = '')
+            fecha = input()
+            formatoValido = isValidFormatoFecha(fecha)
+        
+        fechaMenorHoy = isFechaMenorHoy(fecha)
+        if not fechaMenorHoy:
+            print("La fecha ingresa no puede ser posterior a la de hoy!")
+            print("Ingrese la fecha " + tipo + " nuevamente: ", end = '')
+            fecha = input()
+    
+    return fecha
+
+def ingresoDeRangoDeFechas():
+    print('\n{:*^50}\n'.format("Ingreso de rango de fechas..."))
+    print('\n{:^50}\n'.format("+++ Debe ingresar las fechas con el siguiente formato AAAA-MM-DD +++"))
+
+    dateDesde = 0
+    dateHasta = 0
+
+    rangoCorrecto = False
+
+    while not rangoCorrecto:
+        fechaDesde = ingresoFecha('DESDE')
+        fechaHasta = ingresoFecha('HASTA')
+        
+        dateDesde = np.datetime64(fechaDesde)
+        dateHasta = np.datetime64(fechaHasta)
+
+        if dateDesde <= dateHasta:
+            rangoCorrecto = True
+        else:
+            print("La fecha DESDE del rango no puede ser mayor a la fecha HASTA!\n")
+    
+    return dateDesde, dateHasta
+
 def getAccionesParaAnlizar():
-    acciones = []
     for unId in accionesParaAnalizar:
-        acciones.append(nomAcciones[int(unId)])
-    return acciones
+        accionesParaAnalizarNombre.append(nomAcciones[int(unId)])
 
 def aperturaArchivoAcciones():
     print('\n{:*^50}\n'.format("Abriendo archivos de acciones..."))
-    acciones = getAccionesParaAnlizar()
 
-    archivo1 = pd.read_csv(getNombreArchivoAccion(acciones[0]))
-    data1 = archivo1.to_dict("list")
+    print('\n{:=>50}\n'.format("Abriendo archivo de " + accionesParaAnalizarNombre[0]))
+    archivo1 = pd.read_csv(getNombreArchivoAccion(accionesParaAnalizarNombre[0]))
+    #######
+    archivo1FiltradoDesde = archivo1[archivo1.apply(lambda x: np.datetime64(x['Date']) >= rangoFechaDesde, axis = 1 )]
+    archivo1FiltradoHasta = archivo1FiltradoDesde[archivo1FiltradoDesde.apply(lambda x: np.datetime64(x['Date']) <= rangoFechaHasta, axis = 1 )]
+    data1 = archivo1FiltradoHasta.to_dict("list")
+    #######
+    # data1 = archivo1.to_dict("list")
 
-    archivo2 = pd.read_csv(getNombreArchivoAccion(acciones[1]))
-    data2 = archivo2.to_dict("list")
+    print('\n{:=>50}\n'.format("Abriendo archivo de " + accionesParaAnalizarNombre[1]))
+    archivo2 = pd.read_csv(getNombreArchivoAccion(accionesParaAnalizarNombre[1]))
+    #######
+    archivo2FiltradoDesde = archivo2[archivo2.apply(lambda x: np.datetime64(x['Date']) >= rangoFechaDesde, axis = 1 )]
+    archivo2FiltradoHasta = archivo2FiltradoDesde[archivo2FiltradoDesde.apply(lambda x: np.datetime64(x['Date']) <= rangoFechaHasta, axis = 1 )]
+    data2 = archivo2FiltradoHasta.to_dict("list")
+    #######
+    # data2 = archivo2.to_dict("list")
 
     return data1, data2
 
@@ -117,7 +182,7 @@ def generarGraficoComparativo():
     print('\n{:*^50}\n'.format("Analizando acciones..."))
 
     # Inicializacion de variables
-    acciones = getAccionesParaAnlizar()
+    acciones = accionesParaAnalizarNombre
 
     dateFinAgosto = np.datetime64('2020-09-30')
     dateFinSeptiembre = np.datetime64('2020-09-30')
@@ -196,11 +261,11 @@ def generarGraficoComparativo():
 
     xAcc1.reverse()
     yAcc1.reverse()
-    plt.plot(xAcc1, yAcc1, label = acciones[0])
+    plt.plot(xAcc1, yAcc1, label = accionesParaAnalizarNombre[0])
 
     xAcc2.reverse()
     yAcc2.reverse()
-    plt.plot(xAcc2, yAcc2, label = acciones[1])
+    plt.plot(xAcc2, yAcc2, label = accionesParaAnalizarNombre[1])
 
     # Calculo de cruces entre las acciones
     print('\n{:*^50}\n'.format("Calculando cruces de valores..."))
@@ -218,7 +283,11 @@ def generarGraficoComparativo():
     plt.plot(crucex, crucey, 'k.')
 
     print('\n{:*^50}\n'.format("Generando excel de valores de cruce..."))
-    df = pd.DataFrame({'Fechas de inversion de valores': crucex})
+    if len(crucex) == 0:
+        mensaje = 'Las cotizaciones de las acciones no se cruzaron en el periodo seleccionado'
+        df = pd.DataFrame.from_dict({'Fechas de inversion de valores': mensaje}, orient='index')
+    else:
+        df = pd.DataFrame({'Fechas de inversion de valores': crucex})
     df.to_excel("cruces.xlsx")
 
     # Impresion del grafico comparativo
@@ -230,12 +299,11 @@ def generarGraficoComparativo():
 
     plt.legend()
 
-    plt.savefig('gen-comparativo-' + acciones[0] + '-' + acciones[1] + '.png')
+    plt.savefig('gen-comparativo-' + accionesParaAnalizarNombre[0] + '-' + accionesParaAnalizarNombre[1] + '.png')
     plt.show()
 
 def generarExcelDiferencias():
     print('\n{:*^50}\n'.format("Analizando alzas y bajas..."))
-    acciones = getAccionesParaAnlizar()
 
     # Calculo de que accion crecio mas en diferentes periodos
     difAcc1Sep = valoresInicioCierreMeses1[2] - valoresInicioCierreMeses1[3]
@@ -251,14 +319,14 @@ def generarExcelDiferencias():
         if difAcc1Sep < 0:
             tendencia = 'bajo'
             indice = 1
-        textoCrecimientoSep = 'En Septiembre ' + tendencia + ' mas la accion: ' + acciones[indice]
+        textoCrecimientoSep = 'En Septiembre ' + tendencia + ' mas la accion: ' + accionesParaAnalizarNombre[indice]
     elif difAcc1Sep < difAcc2Sep:
         tendencia = 'crecio'
         indice = 1
         if difAcc2Sep < 0:
             tendencia = 'bajo'
             indice = 0
-        textoCrecimientoSep = 'En Septiembre ' + tendencia + ' mas la accion: ' + acciones[indice]
+        textoCrecimientoSep = 'En Septiembre ' + tendencia + ' mas la accion: ' + accionesParaAnalizarNombre[indice]
     else:
         textoCrecimientoSep = 'Ambas acciones variaron lo mismo en Septiembre.'
 
@@ -269,26 +337,26 @@ def generarExcelDiferencias():
         if difAcc1Oct < 0:
             tendencia = 'bajo'
             indice = 1
-        textoCrecimientoOct = 'En Octubre ' + tendencia + ' mas la accion: ' + acciones[indice]
+        textoCrecimientoOct = 'En Octubre ' + tendencia + ' mas la accion: ' + accionesParaAnalizarNombre[indice]
     elif difAcc1Oct < difAcc2Oct:
         tendencia = 'crecio'
         indice = 1
         if difAcc2Oct < 0:
             tendencia = 'bajo'
             indice = 0
-        textoCrecimientoOct = 'En Octubre ' + tendencia + ' mas la accion: ' + acciones[indice]
+        textoCrecimientoOct = 'En Octubre ' + tendencia + ' mas la accion: ' + accionesParaAnalizarNombre[indice]
     else:
         textoCrecimientoOct = 'Ambas acciones variaron lo mismo en Octubre.'
 
     infoVariaciones = {
-        'Precio inicio Septiembre de ' + acciones[0]: valoresInicioCierreMeses1[0],
-        'Precio fin Septiembre de ' + acciones[0]: valoresInicioCierreMeses1[1],
-        'Precio inicio Octubre de ' + acciones[0]: valoresInicioCierreMeses1[2],
-        'Precio fin Octubre de ' + acciones[0]: valoresInicioCierreMeses1[3],
-        'Precio inicio Septiembre de ' + acciones[1]: valoresInicioCierreMeses2[0],
-        'Precio fin Septiembre de ' + acciones[1]: valoresInicioCierreMeses2[1],
-        'Precio inicio Octubre de ' + acciones[1]: valoresInicioCierreMeses2[2],
-        'Precio fin Octubre de ' + acciones[1]: valoresInicioCierreMeses2[3],
+        'Precio inicio Septiembre de ' + accionesParaAnalizarNombre[0]: valoresInicioCierreMeses1[0],
+        'Precio fin Septiembre de ' + accionesParaAnalizarNombre[0]: valoresInicioCierreMeses1[1],
+        'Precio inicio Octubre de ' + accionesParaAnalizarNombre[0]: valoresInicioCierreMeses1[2],
+        'Precio fin Octubre de ' + accionesParaAnalizarNombre[0]: valoresInicioCierreMeses1[3],
+        'Precio inicio Septiembre de ' + accionesParaAnalizarNombre[1]: valoresInicioCierreMeses2[0],
+        'Precio fin Septiembre de ' + accionesParaAnalizarNombre[1]: valoresInicioCierreMeses2[1],
+        'Precio inicio Octubre de ' + accionesParaAnalizarNombre[1]: valoresInicioCierreMeses2[2],
+        'Precio fin Octubre de ' + accionesParaAnalizarNombre[1]: valoresInicioCierreMeses2[3],
         'Variacion Septiembre': textoCrecimientoSep,
         'Variacion Octubre': textoCrecimientoOct
     }
@@ -298,9 +366,8 @@ def generarExcelDiferencias():
 
 def calcularDerivadasDiscretas():
     data1, data2 = aperturaArchivoAcciones()
-    acciones = getAccionesParaAnlizar()
     
-    print('\n{:*^50}\n'.format("Calculando derivadas de " + acciones[0] + "..."))
+    print('\n{:*^50}\n'.format("Calculando derivadas de " + accionesParaAnalizarNombre[0] + "..."))
     xDer1 = []
     yDer1 = []
     for i in range(1,len(data1["Date"])):
@@ -308,37 +375,59 @@ def calcularDerivadasDiscretas():
         yDer1.append(data1["Open"][i-1] - data1["Open"][i])
     
     
-    plt.plot(xDer1, yDer1, 'm:', label = 'Derivadas ' + acciones[0])
+    plt.plot(xDer1, yDer1, 'm:', label = 'Derivadas ' + accionesParaAnalizarNombre[0])
     plt.xticks(xDer1[ : :500], rotation=45) # Mostrar una de cada 500 fechas
     plt.legend()
-    print('\n{:*^50}\n'.format("Guardando gráfico de derivadas de " + acciones[0] + "..."))
-    plt.savefig('gen-derivadas-' + acciones[0] + '.png')
-    print('\n{:*^50}\n'.format("Graficando derivadas de " + acciones[0] + "..."))
+    print('\n{:*^50}\n'.format("Guardando gráfico de derivadas de " + accionesParaAnalizarNombre[0] + "..."))
+    plt.savefig('gen-derivadas-' + accionesParaAnalizarNombre[0] + '.png')
+    print('\n{:*^50}\n'.format("Graficando derivadas de " + accionesParaAnalizarNombre[0] + "..."))
     plt.show()
 
-    print('\n{:*^50}\n'.format("Calculando derivadas de " + acciones[1] + "..."))
+    print('\n{:*^50}\n'.format("Calculando derivadas de " + accionesParaAnalizarNombre[1] + "..."))
     xDer2 = []
     yDer2 = []
     for i in range(1,len(data2["Date"])):
         xDer2.append(data2["Date"][i])
         yDer2.append(data2["Open"][i-1] - data2["Open"][i])
     
-    plt.plot(xDer2, yDer2, 'm:', label = 'Derivadas ' + acciones[1])
+    plt.plot(xDer2, yDer2, 'm:', label = 'Derivadas ' + accionesParaAnalizarNombre[1])
     plt.xticks(xDer2[ : :500], rotation=45) # Mostrar una de cada 500 fechas
     plt.legend()
-    print('\n{:*^50}\n'.format("Guardando grafico de derivadas de " + acciones[1] + "..."))
-    plt.savefig('gen-derivadas-' + acciones[1] + '.png')
-    print('\n{:*^50}\n'.format("Graficando derivadas de " + acciones[1] + "..."))
+    print('\n{:*^50}\n'.format("Guardando grafico de derivadas de " + accionesParaAnalizarNombre[1] + "..."))
+    plt.savefig('gen-derivadas-' + accionesParaAnalizarNombre[1] + '.png')
+    print('\n{:*^50}\n'.format("Graficando derivadas de " + accionesParaAnalizarNombre[1] + "..."))
     plt.show()
 
 print('\n{:*^50}\n'.format("Inicio de la ejecución..."))
 
-ingresoDeAccionesAAnalizar()
+print("----- Ingrese una opcion -----")
+print("1: Comparación entre Amazon y Google")
+print("2: Comparar 2 acciones a eleccion")
+ingreso = 0
+while ingreso != '1' and ingreso != '2':
+    print("Ingrese una opción: ", end= ' ')
+    ingreso = input()
 
-generarGraficoComparativo()
+if ingreso == '1':
+    accionesParaAnalizarNombre.append('AMZN')
+    accionesParaAnalizarNombre.append('GOOG')
 
-generarExcelDiferencias()
+    rangoFechaDesde, rangoFechaHasta = ingresoDeRangoDeFechas()
 
-calcularDerivadasDiscretas()
+    generarGraficoComparativo()
+
+else:
+    ingresoDeAccionesAAnalizar()
+
+    rangoFechaDesde = np.datetime64('1960-01-01')
+    rangoFechaHasta = np.datetime64('today')
+
+    getAccionesParaAnlizar()
+
+    generarGraficoComparativo()
+
+    generarExcelDiferencias()
+
+    calcularDerivadasDiscretas()
 
 print('\n{:*^50}\n'.format("Fin de la ejecución"))
