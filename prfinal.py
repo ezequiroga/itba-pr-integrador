@@ -442,34 +442,55 @@ def calcularDerivadasDiscretas():
 
 print('\n{:*^50}\n'.format("Inicio de la ejecución..."))
 
-print("----- Ingrese una opcion -----")
-print("1: Comparación entre Amazon y Google")
-print("2: Comparar 2 acciones a eleccion")
-ingreso = 0
-while ingreso != '1' and ingreso != '2':
-    print("Ingrese una opción: ", end= ' ')
-    ingreso = input()
+ingreso = -1
+seguirOperando = True
 
-if ingreso == '1':
-    accionesParaAnalizarNombre.append('AMZN')
-    accionesParaAnalizarNombre.append('GOOG')
+while(seguirOperando):
+    
+    print("----- Ingrese una opcion -----")
+    print("0: Ver ayuda")
+    print("1: Comparación entre Amazon y Google")
+    print("2: Comparar 2 acciones a eleccion")
+    while ingreso != '0' and ingreso != '1' and ingreso != '2':
+        print("Ingrese una opción:", end= ' ')
+        ingreso = input()
 
-    rangoFechaDesde, rangoFechaHasta = ingresoDeRangoDeFechas()
+    if ingreso == '0':
+        print('\n')
+        with open('README.md') as fAyuda:
+            print(fAyuda.read())
 
-    generarGraficoComparativo()
+    elif ingreso == '1':
+        accionesParaAnalizarNombre.append('AMZN')
+        accionesParaAnalizarNombre.append('GOOG')
 
-else:
-    ingresoDeAccionesAAnalizar()
+        rangoFechaDesde, rangoFechaHasta = ingresoDeRangoDeFechas()
 
-    rangoFechaDesde = np.datetime64('1960-01-01')
-    rangoFechaHasta = np.datetime64('today')
+        generarGraficoComparativo()
 
-    getAccionesParaAnlizar()
+    else:
+        ingresoDeAccionesAAnalizar()
 
-    generarGraficoComparativo()
+        rangoFechaDesde = np.datetime64('1960-01-01')
+        rangoFechaHasta = np.datetime64('today')
 
-    generarExcelDiferencias()
+        getAccionesParaAnlizar()
 
-    calcularDerivadasDiscretas()
+        generarGraficoComparativo()
+
+        generarExcelDiferencias()
+
+        calcularDerivadasDiscretas()
+    
+    ingreso = -1
+    seguir = 0
+    while seguir != '1' and seguir != '2':
+        print("----- Desea seguir operando? -----")
+        print("1 -> Si / 2 -> No:", end = ' ')
+        seguir = input()
+    if seguir == '1':
+        seguirOperando = True
+    else:
+        seguirOperando = False
 
 print('\n{:*^50}\n'.format("Fin de la ejecución"))
