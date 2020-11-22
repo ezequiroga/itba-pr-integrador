@@ -196,8 +196,6 @@ def generarGraficoComparativo():
     data1, data2 = aperturaArchivoAcciones()
 
     # Info de Accion 1
-    #archivo1 = pd.read_csv(getNombreArchivoAccion(acciones[0]))
-    #data1 = archivo1.to_dict("list")
     cant1 = len(data1["Date"])
     dateReverse1 = data1["Date"][::-1]
     stocksReverse1 = data1["Open"][::-1]
@@ -205,8 +203,6 @@ def generarGraficoComparativo():
     yAcc1 = []
 
     # Info de Accion 2
-    #archivo2 = pd.read_csv(getNombreArchivoAccion(acciones[1]))
-    #data2 = archivo2.to_dict("list")
     cant2 = len(data2["Date"])
     dateReverse2 = data2["Date"][::-1]
     stocksReverse2 = data2["Open"][::-1]
@@ -218,13 +214,22 @@ def generarGraficoComparativo():
     if cant1 < cant2 : cantAcciones = cant2
     if cant1 < cant2 : minimoAcciones = cant1
 
-    #Recorro hasta el máximo numero máximo de datos entre ambas
+    date01=np.datetime64(dateReverse1[0])
+    date02=np.datetime64(dateReverse2[0])
+    diaUnoAnio1 = 0
+    diaUnoAnio2 = 0
+    #Recorro hasta el numero máximo de datos entre ambas
+    difAnio = np.timedelta64(365, 'D')
     for i in range(cantAcciones):
         #Si no hay valor para el i, asumo que no hay mas datos para la accion
         #entonces en el except pongo la fecha de la otra acciones y valor 0
         try:
             xAcc1.append(dateReverse1[i])
             yAcc1.append(stocksReverse1[i])
+
+            date = np.datetime64(dateReverse1[i])
+            if (date01 - date) >= difAnio and diaUnoAnio1 == 0:
+                diaUnoAnio1 = i
         except:
             xAcc1.append(dateReverse2[i])
             yAcc1.append(0)
@@ -232,6 +237,10 @@ def generarGraficoComparativo():
         try:
             xAcc2.append(dateReverse2[i])
             yAcc2.append(stocksReverse2[i])
+
+            date = np.datetime64(dateReverse2[i])
+            if (date02 - date) >= difAnio and diaUnoAnio2 == 0:
+                diaUnoAnio2 = i
         except:
             xAcc2.append(dateReverse1[i])
             yAcc2.append(0)
@@ -258,6 +267,11 @@ def generarGraficoComparativo():
                     ultimoDiaAgosto = False
             except:
                 pass
+
+    valoresInicioCierreMeses1.append(stocksReverse1[0])
+    valoresInicioCierreMeses1.append(stocksReverse1[diaUnoAnio1])
+    valoresInicioCierreMeses2.append(stocksReverse2[0])
+    valoresInicioCierreMeses2.append(stocksReverse2[diaUnoAnio2])
 
     xAcc1.reverse()
     yAcc1.reverse()
@@ -306,11 +320,13 @@ def generarExcelDiferencias():
     print('\n{:*^50}\n'.format("Analizando alzas y bajas..."))
 
     # Calculo de que accion crecio mas en diferentes periodos
-    difAcc1Sep = valoresInicioCierreMeses1[2] - valoresInicioCierreMeses1[3]
-    difAcc1Oct = valoresInicioCierreMeses1[0] - valoresInicioCierreMeses1[1]
-
-    difAcc2Sep = valoresInicioCierreMeses2[2] - valoresInicioCierreMeses2[3]
-    difAcc2Oct = valoresInicioCierreMeses2[0] - valoresInicioCierreMeses2[1]
+    difAcc1Oct = valoresInicioCierreMeses1[1] - valoresInicioCierreMeses1[0]
+    difAcc1Sep = valoresInicioCierreMeses1[3] - valoresInicioCierreMeses1[2]
+    difAcc1Anual = valoresInicioCierreMeses1[4] - valoresInicioCierreMeses1[5]
+    
+    difAcc2Oct = valoresInicioCierreMeses2[1] - valoresInicioCierreMeses2[0]
+    difAcc2Sep = valoresInicioCierreMeses2[3] - valoresInicioCierreMeses2[2]
+    difAcc2Anual = valoresInicioCierreMeses2[4] - valoresInicioCierreMeses2[5]
 
     textoCrecimientoSep = ''
     if difAcc1Sep > difAcc2Sep:
@@ -348,18 +364,44 @@ def generarExcelDiferencias():
     else:
         textoCrecimientoOct = 'Ambas acciones variaron lo mismo en Octubre.'
 
+    textoCrecimientoAnual = ''
+    if difAcc1Anual > difAcc2Anual:
+        tendencia = 'crecio'
+        indice = 0
+        if difAcc1Anual < 0:
+            tendencia = 'bajo'
+            indice = 1
+        textoCrecimientoAnual = 'En los últimos 12 mese ' + tendencia + ' mas la accion: ' + accionesParaAnalizarNombre[indice]
+    elif difAcc1Anual < difAcc2Anual:
+        tendencia = 'crecio'
+        indice = 1
+        if difAcc2Anual < 0:
+            tendencia = 'bajo'
+            indice = 0
+        textoCrecimientoAnual = 'En los últimos 12 mese ' + tendencia + ' mas la accion: ' + accionesParaAnalizarNombre[indice]
+    else:
+        textoCrecimientoAnual = 'En los últimos 12 mese ambas acciones variaron lo mismo.'
+
     infoVariaciones = {
         'Precio inicio Septiembre de ' + accionesParaAnalizarNombre[0]: valoresInicioCierreMeses1[0],
         'Precio fin Septiembre de ' + accionesParaAnalizarNombre[0]: valoresInicioCierreMeses1[1],
         'Precio inicio Octubre de ' + accionesParaAnalizarNombre[0]: valoresInicioCierreMeses1[2],
         'Precio fin Octubre de ' + accionesParaAnalizarNombre[0]: valoresInicioCierreMeses1[3],
+        'Precio hace un año ' + accionesParaAnalizarNombre[0]: valoresInicioCierreMeses1[5],
+        'Ultimo precio ' + accionesParaAnalizarNombre[0]: valoresInicioCierreMeses1[4],
+
         'Precio inicio Septiembre de ' + accionesParaAnalizarNombre[1]: valoresInicioCierreMeses2[0],
         'Precio fin Septiembre de ' + accionesParaAnalizarNombre[1]: valoresInicioCierreMeses2[1],
         'Precio inicio Octubre de ' + accionesParaAnalizarNombre[1]: valoresInicioCierreMeses2[2],
         'Precio fin Octubre de ' + accionesParaAnalizarNombre[1]: valoresInicioCierreMeses2[3],
+        'Precio hace un año ' + accionesParaAnalizarNombre[1]: valoresInicioCierreMeses2[5],
+        'Ultimo precio ' + accionesParaAnalizarNombre[1]: valoresInicioCierreMeses2[4],
+
         'Variacion Septiembre': textoCrecimientoSep,
-        'Variacion Octubre': textoCrecimientoOct
+        'Variacion Octubre': textoCrecimientoOct,
+        'Variacion en los ultimos 12 meses': textoCrecimientoAnual
     }
+
     print('\n{:*^50}\n'.format("Generando excel de alzas y bajas..."))
     df = pd.DataFrame.from_dict(infoVariaciones, orient='index')
     df.to_excel("variaciones.xlsx")

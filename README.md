@@ -29,6 +29,7 @@ Los pasos siguientes se ejecutan sobre el rango seleccionado
 3. Se calculan las intersecciones entre las cotizaciones de ambas acciones.
 4. Se guarda un excel con el listado de las fechas en las que ocurrieron las intersecciones.
 5. Se guarda y muestra en pantalla el gráfico comparativo de ambas acciones, marcando los puntos de intersección.
-6. Se calculan las derivadas discretas de cada acción.
-7. Se guardan y muestran en pantalla los gráficos cada una de las derivadas calculadas.
+6. Se genera un excel con la informacion de que accion crecio/bajo mas en Septiembre, Octubre y los últimos 12 meses.
+7. Se calculan las derivadas discretas de cada acción.
+8. Se guardan y muestran en pantalla los gráficos de cada una de las derivadas calculadas.
 
