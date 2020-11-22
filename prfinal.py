@@ -476,6 +476,7 @@ while(seguirOperando):
 
         calcularDerivadasDiscretas()
     
+    ingreso = 0
     seguir = 0
     while seguir != '1' and seguir != '2':
         print("----- Desea seguir operando? -----")
